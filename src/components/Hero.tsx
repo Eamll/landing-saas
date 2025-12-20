@@ -207,18 +207,42 @@ export default function Hero() {
           {/* Main Title */}
           <h1
             ref={titleRef}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
-            style={{ perspective: '1000px' }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light mb-6 leading-tight"
+            style={{
+              perspective: '1000px',
+              color: 'rgba(220, 255, 220, 0.95)',
+              textShadow: `
+                0 0 10px rgba(34, 197, 94, 0.8),
+                0 0 20px rgba(34, 197, 94, 0.6),
+                0 0 40px rgba(34, 197, 94, 0.5),
+                0 0 80px rgba(34, 197, 94, 0.4),
+                0 0 120px rgba(34, 197, 94, 0.3),
+                0 0 160px rgba(34, 197, 94, 0.2)
+              `,
+            }}
           >
             <span className="word inline-block">No</span>{' '}
             <span className="word inline-block">Time</span>{' '}
             <span className="word inline-block">Limit</span>{' '}
-            <span className="word inline-block text-green-400">Prop</span>{' '}
-            <span className="word inline-block text-green-400">Firm</span>
+            <span className="word inline-block">Prop</span>{' '}
+            <span className="word inline-block">Firm</span>
           </h1>
 
           {/* Subtitle */}
-          <p ref={subtitleRef} className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-green-400/80 mb-10 opacity-0">
+          <p
+            ref={subtitleRef}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light mb-10 opacity-0"
+            style={{
+              color: 'rgba(180, 240, 200, 0.9)',
+              textShadow: `
+                0 0 10px rgba(34, 197, 94, 0.8),
+                0 0 20px rgba(34, 197, 94, 0.6),
+                0 0 40px rgba(34, 197, 94, 0.5),
+                0 0 80px rgba(34, 197, 94, 0.4),
+                0 0 120px rgba(34, 197, 94, 0.2)
+              `,
+            }}
+          >
             Conquer the market
           </p>
 
