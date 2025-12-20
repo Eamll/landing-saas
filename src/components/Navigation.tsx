@@ -70,19 +70,19 @@ export default function Navigation() {
           <span className="text-xl font-bold text-white">Nology</span>
         </div>
 
-        {/* Navigation Links - centered, takes available space */}
+        {/* Navigation Links - starts after logo, proper spacing */}
         <div
           ref={linksRef}
-          className="hidden xl:flex items-center justify-center gap-1"
-          style={{ flex: '1 1 auto' }}
+          className="hidden xl:flex items-center"
+          style={{ marginLeft: '48px', gap: '8px' }}
         >
           <a href="#" className="nav-link active opacity-0">Home</a>
-          <a href="#" className="nav-link px-4 py-2 opacity-0">How it Works</a>
-          <a href="#" className="nav-link px-4 py-2 opacity-0">Programs</a>
-          <a href="#" className="nav-link px-4 py-2 opacity-0">Support</a>
-          <a href="#" className="nav-link px-4 py-2 opacity-0">Careers</a>
-          <a href="#" className="nav-link px-4 py-2 opacity-0">Become a Partner</a>
-          <a href="#" className="nav-link px-4 py-2 opacity-0">Login / Register</a>
+          <a href="#" className="nav-link opacity-0" style={{ padding: '8px 16px' }}>How it Works</a>
+          <a href="#" className="nav-link opacity-0" style={{ padding: '8px 16px' }}>Programs</a>
+          <a href="#" className="nav-link opacity-0" style={{ padding: '8px 16px' }}>Support</a>
+          <a href="#" className="nav-link opacity-0" style={{ padding: '8px 16px' }}>Careers</a>
+          <a href="#" className="nav-link opacity-0" style={{ padding: '8px 16px' }}>Become a Partner</a>
+          <a href="#" className="nav-link opacity-0" style={{ padding: '8px 16px' }}>Login / Register</a>
         </div>
 
         {/* Action Buttons - fixed width, doesn't shrink */}
