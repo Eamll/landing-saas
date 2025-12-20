@@ -95,41 +95,77 @@ export default function Hero() {
       '-=0.2'
     );
 
+    // Continuous loop animation - elements move from center outward, fade, respawn
+    const animateMathElement = (el: HTMLDivElement, index: number, isInitial: boolean = true) => {
+      const containerRect = el.parentElement?.getBoundingClientRect();
+      if (!containerRect) return;
+
+      // Get the element's target position from its CSS left/top
+      const targetX = parseFloat(el.style.left) / 100 * containerRect.width;
+      const targetY = parseFloat(el.style.top) / 100 * containerRect.height;
+
+      // Center of container
+      const centerX = containerRect.width / 2;
+      const centerY = containerRect.height / 2;
+
+      // Calculate direction vector from center to target
+      const dirX = targetX - centerX;
+      const dirY = targetY - centerY;
+
+      // Extend beyond target for the fade-out point (1.3x distance)
+      const extendedX = dirX * 1.4;
+      const extendedY = dirY * 1.4;
+
+      // Random duration for variety (8-14 seconds per cycle)
+      const duration = 8 + Math.random() * 6;
+      const delay = isInitial ? index * 0.3 : 0;
+
+      // Create the animation timeline for this element
+      const elementTl = gsap.timeline({
+        delay,
+        onComplete: () => {
+          // Respawn from center when complete
+          animateMathElement(el, index, false);
+        }
+      });
+
+      // Start from center, move outward, fade out at the end
+      elementTl
+        .set(el, {
+          x: -dirX, // Offset to place at center
+          y: -dirY,
+          opacity: 0,
+          scale: 0.3,
+          rotation: (Math.random() - 0.5) * 40
+        })
+        // Fade in and start moving
+        .to(el, {
+          opacity: 1,
+          scale: 1,
+          rotation: 0,
+          duration: duration * 0.2,
+          ease: 'power2.out'
+        })
+        // Continue moving outward (main movement phase)
+        .to(el, {
+          x: extendedX - dirX,
+          y: extendedY - dirY,
+          duration: duration * 0.7,
+          ease: 'none'
+        }, '<')
+        // Fade out as it reaches the edge
+        .to(el, {
+          opacity: 0,
+          scale: 0.5,
+          duration: duration * 0.3,
+          ease: 'power2.in'
+        }, `-=${duration * 0.3}`);
+    };
+
+    // Start all math element animations with staggered timing
     mathRefs.current.forEach((el, index) => {
       if (el) {
-        const randomX = (Math.random() - 0.5) * 100;
-        const randomY = (Math.random() - 0.5) * 100;
-        const randomRotation = (Math.random() - 0.5) * 30;
-
-        tl.fromTo(
-          el,
-          {
-            opacity: 0,
-            x: randomX,
-            y: randomY,
-            rotation: randomRotation,
-            scale: 0.5
-          },
-          {
-            opacity: 1,
-            x: 0,
-            y: 0,
-            rotation: 0,
-            scale: 1,
-            duration: 0.8,
-            ease: 'power3.out'
-          },
-          1 + index * 0.1
-        );
-
-        gsap.to(el, {
-          y: '+=10',
-          duration: 2 + Math.random() * 2,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: index * 0.2
-        });
+        animateMathElement(el, index, true);
       }
     });
 
@@ -187,7 +223,7 @@ export default function Hero() {
           </p>
 
           {/* Feature Badges */}
-          <div ref={featuresRef} className="flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8 mb-12">
+          <div ref={featuresRef} className="flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8" style={{ marginBottom: '48px' }}>
             {features.map((feature, index) => (
               <div key={index} className="feature-badge opacity-0">
                 {feature}
