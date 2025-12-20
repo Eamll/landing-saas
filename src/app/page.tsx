@@ -1,11 +1,16 @@
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
+import Stats from '@/components/Stats';
+import SmoothScroll from '@/components/SmoothScroll';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#0a0a0a]">
+    <main className="bg-[#0a0a0a]">
       <Navigation />
-      <Hero />
+      <SmoothScroll>
+        <Hero />
+        <Stats />
+      </SmoothScroll>
     </main>
   );
 }

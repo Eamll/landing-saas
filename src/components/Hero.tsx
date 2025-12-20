@@ -172,7 +172,7 @@ export default function Hero() {
   }, { scope: heroRef });
 
   return (
-    <section ref={heroRef} className="relative min-h-screen overflow-hidden">
+    <section ref={heroRef} className="snap-section relative min-h-screen overflow-hidden">
       {/* Aurora Background */}
       <div className="aurora-bg" />
 
