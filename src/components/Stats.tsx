@@ -11,38 +11,50 @@ const stats = [
   { value: '12h', label: 'Average Payout Time', position: 'center' },
 ];
 
-// Grid configuration
-const GRID_COLS = 20;
-const GRID_ROWS = 12;
-const CELL_SIZE = 80;
+// Grid line configuration - full viewport coverage
+const LINE_SPACING = 160;
 
 export default function Stats() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
-  const [cells, setCells] = useState<{ id: number; x: number; y: number; opacity: number }[]>([]);
+  const [gridLines, setGridLines] = useState<{ horizontal: number[]; vertical: number[] }>({ horizontal: [], vertical: [] });
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Initialize grid cells
+  // Initialize grid lines based on viewport size
   useEffect(() => {
-    const newCells = [];
-    for (let row = 0; row < GRID_ROWS; row++) {
-      for (let col = 0; col < GRID_COLS; col++) {
-        newCells.push({
-          id: row * GRID_COLS + col,
-          x: col * CELL_SIZE,
-          y: row * CELL_SIZE,
-          opacity: 0
-        });
+    const updateGrid = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      setDimensions({ width, height });
+
+      const horizontal = [];
+      const vertical = [];
+
+      // Create lines covering entire viewport
+      const numHorizontal = Math.ceil(height / LINE_SPACING) + 1;
+      const numVertical = Math.ceil(width / LINE_SPACING) + 1;
+
+      for (let i = 0; i < numHorizontal; i++) {
+        horizontal.push(i * LINE_SPACING);
       }
-    }
-    setCells(newCells);
+      for (let i = 0; i < numVertical; i++) {
+        vertical.push(i * LINE_SPACING);
+      }
+
+      setGridLines({ horizontal, vertical });
+    };
+
+    updateGrid();
+    window.addEventListener('resize', updateGrid);
+    return () => window.removeEventListener('resize', updateGrid);
   }, []);
 
-  // Handle mouse move for grid effect
+  // Handle mouse move for grid effect - track relative to section
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (gridRef.current) {
-        const rect = gridRef.current.getBoundingClientRect();
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
         setMousePos({
           x: e.clientX - rect.left,
           y: e.clientY - rect.top
@@ -68,16 +80,23 @@ export default function Stats() {
     };
   }, []);
 
-  // Calculate cell opacity based on distance from mouse
-  const getCellOpacity = (cellX: number, cellY: number) => {
-    const cellCenterX = cellX + CELL_SIZE / 2;
-    const cellCenterY = cellY + CELL_SIZE / 2;
-    const distance = Math.sqrt(
-      Math.pow(mousePos.x - cellCenterX, 2) + Math.pow(mousePos.y - cellCenterY, 2)
-    );
-    const maxDistance = 250;
+  // Calculate line opacity based on distance from mouse
+  const getLineOpacity = (linePos: number, isHorizontal: boolean) => {
+    const mouseCoord = isHorizontal ? mousePos.y : mousePos.x;
+    const distance = Math.abs(mouseCoord - linePos);
+    const maxDistance = 200;
     const opacity = Math.max(0, 1 - distance / maxDistance);
-    return opacity;
+    return opacity * 0.8;
+  };
+
+  // Calculate intersection glow intensity
+  const getIntersectionGlow = (x: number, y: number) => {
+    const distance = Math.sqrt(
+      Math.pow(mousePos.x - x, 2) + Math.pow(mousePos.y - y, 2)
+    );
+    const maxDistance = 150;
+    const intensity = Math.max(0, 1 - distance / maxDistance);
+    return intensity;
   };
 
   // GSAP animations - triggered when section becomes visible
@@ -143,32 +162,107 @@ export default function Stats() {
       className="snap-section relative overflow-hidden"
       style={{ background: '#050505', minHeight: '100vh' }}
     >
-      {/* Grid Background with Hover Effect */}
+      {/* Grid Lines with Central Glow Effect - Full Viewport */}
       <div
         ref={gridRef}
         className="absolute inset-0 overflow-hidden"
-        style={{ opacity: 0.8 }}
       >
-        {cells.map((cell) => {
-          const opacity = getCellOpacity(cell.x, cell.y);
+        {/* Horizontal lines - full width */}
+        {gridLines.horizontal.map((y, i) => {
+          const opacity = getLineOpacity(y, true);
           return (
             <div
-              key={cell.id}
+              key={`h-${i}`}
               className="absolute"
               style={{
-                left: cell.x,
-                top: cell.y,
-                width: CELL_SIZE,
-                height: CELL_SIZE,
-                border: '1px solid',
-                borderColor: `rgba(34, 197, 94, ${opacity * 0.6})`,
-                background: `rgba(34, 197, 94, ${opacity * 0.05})`,
-                boxShadow: opacity > 0.1 ? `inset 0 0 ${20 * opacity}px rgba(34, 197, 94, ${opacity * 0.1})` : 'none',
-                transition: 'border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease'
+                top: y,
+                left: 0,
+                right: 0,
+                height: '1px',
+                background: opacity > 0.05
+                  ? `linear-gradient(90deg,
+                      rgba(34, 197, 94, ${opacity * 0.15}) 0%,
+                      rgba(34, 197, 94, ${opacity * 0.4}) ${Math.max(0, (mousePos.x / dimensions.width) * 100 - 20)}%,
+                      rgba(34, 197, 94, ${opacity * 0.8}) ${(mousePos.x / dimensions.width) * 100}%,
+                      rgba(34, 197, 94, ${opacity * 0.4}) ${Math.min(100, (mousePos.x / dimensions.width) * 100 + 20)}%,
+                      rgba(34, 197, 94, ${opacity * 0.15}) 100%)`
+                  : 'rgba(34, 197, 94, 0.08)',
+                boxShadow: opacity > 0.2 ? `0 0 ${12 * opacity}px rgba(34, 197, 94, ${opacity * 0.5})` : 'none',
+                transition: 'box-shadow 0.1s ease'
               }}
             />
           );
         })}
+
+        {/* Vertical lines - full height */}
+        {gridLines.vertical.map((x, i) => {
+          const opacity = getLineOpacity(x, false);
+          return (
+            <div
+              key={`v-${i}`}
+              className="absolute"
+              style={{
+                left: x,
+                top: 0,
+                bottom: 0,
+                width: '1px',
+                background: opacity > 0.05
+                  ? `linear-gradient(180deg,
+                      rgba(34, 197, 94, ${opacity * 0.15}) 0%,
+                      rgba(34, 197, 94, ${opacity * 0.4}) ${Math.max(0, (mousePos.y / dimensions.height) * 100 - 20)}%,
+                      rgba(34, 197, 94, ${opacity * 0.8}) ${(mousePos.y / dimensions.height) * 100}%,
+                      rgba(34, 197, 94, ${opacity * 0.4}) ${Math.min(100, (mousePos.y / dimensions.height) * 100 + 20)}%,
+                      rgba(34, 197, 94, ${opacity * 0.15}) 100%)`
+                  : 'rgba(34, 197, 94, 0.08)',
+                boxShadow: opacity > 0.2 ? `0 0 ${12 * opacity}px rgba(34, 197, 94, ${opacity * 0.5})` : 'none',
+                transition: 'box-shadow 0.1s ease'
+              }}
+            />
+          );
+        })}
+
+        {/* Intersection glow points */}
+        {gridLines.horizontal.map((y, hi) =>
+          gridLines.vertical.map((x, vi) => {
+            const glow = getIntersectionGlow(x, y);
+            if (glow < 0.15) return null;
+            return (
+              <div
+                key={`int-${hi}-${vi}`}
+                className="absolute pointer-events-none"
+                style={{
+                  left: x,
+                  top: y,
+                  width: '6px',
+                  height: '6px',
+                  marginLeft: '-3px',
+                  marginTop: '-3px',
+                  borderRadius: '50%',
+                  background: `rgba(255, 255, 255, ${glow})`,
+                  boxShadow: `0 0 ${25 * glow}px ${12 * glow}px rgba(34, 197, 94, ${glow * 0.7}),
+                              0 0 ${50 * glow}px ${25 * glow}px rgba(34, 197, 94, ${glow * 0.4})`,
+                }}
+              />
+            );
+          })
+        )}
+
+        {/* Central cursor glow orb */}
+        {mousePos.x > 0 && (
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              left: mousePos.x,
+              top: mousePos.y,
+              width: '300px',
+              height: '300px',
+              marginLeft: '-150px',
+              marginTop: '-150px',
+              background: 'radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.05) 40%, transparent 70%)',
+              borderRadius: '50%',
+            }}
+          />
+        )}
       </div>
 
       {/* Content */}
