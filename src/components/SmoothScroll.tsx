@@ -108,11 +108,11 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
 
     const targetY = index * window.innerHeight;
 
-    // Smooth GSAP animation
+    // Faster, smoother GSAP animation
     gsap.to(containerRef.current, {
       y: -targetY,
-      duration: 1.2,
-      ease: 'power3.inOut',
+      duration: 0.6,
+      ease: 'power2.out',
       onComplete: () => {
         setCurrentSection(index);
         setIsAnimating(false);

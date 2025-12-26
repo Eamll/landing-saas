@@ -122,8 +122,8 @@ export default function Features() {
 
         gsap.to(panelsRef.current, {
           x: -nextPanel * window.innerWidth,
-          duration: 1,
-          ease: 'power3.inOut',
+          duration: 0.5,
+          ease: 'power2.out',
           onComplete: () => {
             isAnimatingRef.current = false;
           },
@@ -296,8 +296,8 @@ export default function Features() {
               setCurrentPanel(i);
               gsap.to(panelsRef.current, {
                 x: -i * window.innerWidth,
-                duration: 1,
-                ease: 'power3.inOut',
+                duration: 0.5,
+                ease: 'power2.out',
                 onComplete: () => {
                   isAnimatingRef.current = false;
                 },
