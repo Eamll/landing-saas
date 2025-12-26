@@ -176,6 +176,53 @@ export default function Hero() {
       {/* Aurora Background */}
       <div className="aurora-bg" />
 
+      {/* Natural ambient glow - center focus */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(
+              ellipse 80% 50% at 50% 45%,
+              rgba(34, 197, 94, 0.08) 0%,
+              rgba(34, 197, 94, 0.04) 40%,
+              transparent 70%
+            )
+          `,
+          zIndex: 1,
+        }}
+      />
+
+      {/* Soft upper glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(
+              ellipse 60% 40% at 50% 30%,
+              rgba(34, 197, 94, 0.06) 0%,
+              rgba(34, 197, 94, 0.03) 50%,
+              transparent 80%
+            )
+          `,
+          zIndex: 1,
+        }}
+      />
+
+      {/* Subtle vignette from corners */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(
+              ellipse 100% 100% at 50% 50%,
+              transparent 30%,
+              rgba(0, 0, 0, 0.4) 100%
+            )
+          `,
+          zIndex: 1,
+        }}
+      />
+
       {/* Math elements container */}
       <div className="absolute inset-0">
         <div className="relative w-full h-full max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-20">
